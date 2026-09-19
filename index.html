@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>미국 주식 시장환경 대시보드</title>
+<style>
+:root {
+  color-scheme: light;
+  --bg: #f4f5f7;
+  --card-bg: #ffffff;
+  --text: #1f2430;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Pretendard, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+header {
+  padding: 20px 28px;
+  background: #111827;
+  color: #f9fafb;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+header h1 { margin: 0 0 4px 0; font-size: 20px; }
+header .updated { color: #9ca3af; font-size: 13px; }
+header .health { font-size: 13px; margin-top: 2px; font-weight: 600; }
+header .health.ok { color: #6ee7b7; }
+header .health.warn { color: #fcd34d; }
+main { padding: 24px 28px 60px; max-width: 1200px; margin: 0 auto; }
+section { margin-bottom: 36px; scroll-margin-top: 84px; }
+section h2 {
+  font-size: 16px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 2px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 8px;
+}
+section .section-desc {
+  font-size: 12.5px;
+  color: var(--muted);
+  margin: 8px 0 14px;
+}
+
+/* 요약(한눈에 보기) 스트립 */
+.summary-section { margin-bottom: 30px; }
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+}
+.chip {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 10px;
+  text-decoration: none;
+  color: inherit;
+}
+.chip-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+}
+.chip-label { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chip-value { font-size: 17px; font-weight: 700; }
+.chip-band {
+  flex-shrink: 0;
+  font-size: 10px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+.chip-trend { display: inline-flex; gap: 4px; flex-shrink: 0; }
+.chip-trend-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 15px;
+  height: 15px;
+  border-radius: 999px;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+}
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.card-header h3 { font-size: 14px; margin: 0; font-weight: 600; padding-top: 2px; }
+.hdr-trend { display: flex; flex-direction: column; gap: 5px; flex-shrink: 0; }
+.hdr-trend-row { display: flex; align-items: center; justify-content: flex-end; gap: 6px; }
+.hdr-trend-label { font-size: 11px; color: var(--muted); white-space: nowrap; }
+.hdr-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.value { font-size: 28px; font-weight: 700; margin-bottom: 4px; font-variant-numeric: tabular-nums; }
+.value-suffix { font-size: inherit; font-weight: inherit; }
+.asof { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+.compare-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--text);
+  padding: 3px 0;
+}
+.compare-row span:first-child { color: var(--muted); }
+.extra-line { font-size: 12px; color: var(--muted); margin-top: 6px; }
+.note-list {
+  margin: 10px 0 0;
+  padding: 8px 0 0 18px;
+  border-top: 1px dashed var(--border);
+  font-size: 11.5px;
+  color: var(--muted);
+  line-height: 1.45;
+}
+.note-list li { margin-bottom: 3px; }
+.note-list li:last-child { margin-bottom: 0; }
+.band {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+  font-weight: 600;
+}
+.band-neutral, .chip-band.band-neutral { background: #e5e7eb; color: #374151; }
+/* 5단계 점수 색상(사용자 지정 구간표) — 1 광기 · 2 과열 · 3 중립 · 4 불안 · 5 공포 */
+.score-1 { background: #fecaca; color: #b91c1c; }
+.score-2 { background: #fed7aa; color: #9a3412; }
+.score-3 { background: #fef08a; color: #854d0e; }
+.score-4 { background: #bbf7d0; color: #166534; }
+.score-5 { background: #bfdbfe; color: #1e40af; }
+
+/* 구간 게이지 바 */
+.gauge { margin: 8px 0 10px; padding-top: 6px; }
+.gauge-track {
+  display: flex;
+  height: 6px;
+  border-radius: 3px;
+  overflow: hidden;
+  background: var(--border);
+}
+.gauge-marker {
+  position: relative;
+  width: 2px;
+  height: 12px;
+  margin-top: -12px;
+  background: #111827;
+  transform: translateX(-1px);
+}
+
+/* 카드 상단 안내 태그(예: 수동 갱신 필요) */
+.tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.tag {
+  font-size: 10.5px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.tag-manual { background: #e0f2fe; color: #075985; }
+
+.banner {
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+.banner-error { background: #fee2e2; color: #991b1b; }
+.banner-warn { background: #fef3c7; color: #92400e; }
+.charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 16px; }
+.chart-box {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  height: 260px;
+}
+.chart-box-wide { height: 440px; }
+.chart-box h3 { font-size: 13px; font-weight: 600; margin: 0 0 10px 0; }
+.chart-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: calc(100% - 30px);
+  color: var(--muted);
+  font-size: 13px;
+  text-align: center;
+}
+footer { text-align: center; color: var(--muted); font-size: 12px; padding-bottom: 24px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>미국 주식 시장환경 대시보드</h1>
+  <div class="updated">마지막 갱신 시각: 2026-09-20 04:51:38</div>
+  <div class="health ok">데이터 상태: 12/12개 지표 정상 수집</div>
+</header>
+<main>
+  
+    <section class="summary-section">
+      <h2>한눈에 보기</h2>
+      <div class="section-desc">지표 칩을 클릭하면 아래 상세 섹션으로 이동합니다.</div>
+      <div class="summary-grid">
+    <a class="chip" href="#sec-liquidity">
+      <div class="chip-top">
+        <span class="chip-label">10Y 국채금리</span>
+        <span class="chip-trend"><span class="chip-trend-badge score-5" title="지난 주 대비">▼</span><span class="chip-trend-badge score-1" title="지난 달 대비">▲</span></span>
+      </div>
+      <span class="chip-value">4.94%</span>
+    </a>
+    
+    <a class="chip" href="#sec-liquidity">
+      <div class="chip-top">
+        <span class="chip-label">달러지수(DXY)</span>
+        <span class="chip-trend"><span class="chip-trend-badge score-5" title="지난 주 대비">▼</span><span class="chip-trend-badge score-5" title="지난 달 대비">▼</span></span>
+      </div>
+      <span class="chip-value">99.07</span>
+    </a>
+    
+    <a class="chip" href="#sec-trend">
+      <div class="chip-top">
+        <span class="chip-label">NFCI</span>
+        <span class="chip-trend"><span class="chip-trend-badge score-5" title="지난 주 대비">▼</span><span class="chip-trend-badge score-5" title="지난 달 대비">▼</span></span>
+      </div>
+      <span class="chip-value">-0.560</span>
+    </a>
+    
+    <a class="chip" href="#sec-breadth">
+      <div class="chip-top">
+        <span class="chip-label">시장폭 50DMA</span>
+        <span class="chip-band score-5">비관 구간</span>
+      </div>
+      <span class="chip-value">27.9%</span>
+    </a>
+    
+    <a class="chip" href="#sec-breadth">
+      <div class="chip-top">
+        <span class="chip-label">시장폭 200DMA</span>
+        <span class="chip-band band-neutral">중립 구간</span>
+      </div>
+      <span class="chip-value">49.3%</span>
+    </a>
+    
+    <a class="chip" href="#sec-breadth">
+      <div class="chip-top">
+        <span class="chip-label">S&amp;P500 200주선</span>
+        <span class="chip-band band-neutral">200주선 상회</span>
+      </div>
+      <span class="chip-value">+35.7%</span>
+    </a>
+    
+    <a class="chip" href="#sec-sentiment">
+      <div class="chip-top">
+        <span class="chip-label">Fear &amp; Greed</span>
+        <span class="chip-band score-4">4 · 불안</span>
+      </div>
+      <span class="chip-value">29</span>
+    </a>
+    
+    <a class="chip" href="#sec-sentiment">
+      <div class="chip-top">
+        <span class="chip-label">VIX</span>
+        <span class="chip-band score-2">2 · 과열</span>
+      </div>
+      <span class="chip-value">15.44</span>
+    </a>
+    
+    <a class="chip" href="#sec-sentiment">
+      <div class="chip-top">
+        <span class="chip-label">AAII 스프레드</span>
+        <span class="chip-band score-4">4 · 불안</span>
+      </div>
+      <span class="chip-value">-24.5%p</span>
+    </a>
+    
+    <a class="chip" href="#sec-contrarian">
+      <div class="chip-top">
+        <span class="chip-label">Put/Call</span>
+        <span class="chip-band score-3">3 · 중립</span>
+      </div>
+      <span class="chip-value">0.81</span>
+    </a>
+    
+    <a class="chip" href="#sec-credit">
+      <div class="chip-top">
+        <span class="chip-label">Margin YoY</span>
+        <span class="chip-band score-2">2 · 과열</span>
+      </div>
+      <span class="chip-value">+37.2%</span>
+    </a>
+    
+    <a class="chip" href="#sec-credit">
+      <div class="chip-top">
+        <span class="chip-label">HY Spread</span>
+        <span class="chip-band score-1">1 · 광기</span>
+      </div>
+      <span class="chip-value">2.70%</span>
+    </a>
+    </div>
+    </section>
+    
+  
+    <section id="sec-liquidity">
+      <h2>유동성</h2>
+      <div class="section-desc">금리·달러 환경이 완화적인지 긴축적인지 참고하는 영역입니다.</div>
+      <div class="cards">
+        
+    <div class="card">
+      <div class="card-header">
+        <h3>미국 10년물 국채금리</h3>
+        <div class="hdr-trend"><div class="hdr-trend-row"><span class="hdr-trend-label">지난 주 대비</span><span class="hdr-badge score-5">▼</span></div><div class="hdr-trend-row"><span class="hdr-trend-label">지난 달 대비</span><span class="hdr-badge score-1">▲</span></div></div>
+      </div>
+      
+      
+      
+      <div class="value">4.94%</div>
+      <div class="asof">기준일 2026-09-17</div>
+      
+      <div class="compare-row"><span>지난 주 대비</span><span>▼ -0.01%</span></div><div class="compare-row"><span>지난 달 대비</span><span>▲ +0.23%</span></div>
+      <ul class="note-list"><li>금리↑ → 증시 부담 (다우·에너지·금융은 견조)</li><li>금리↓ → 증시 우호 (건설·리츠·나스닥·고성장주)</li><li>마디선(라운드 넘버) 돌파 시 단기 변동성 유의</li></ul>
+    
+    </div>
+    
+        
+    <div class="card">
+      <div class="card-header">
+        <h3>미국 달러지수(DXY)</h3>
+        <div class="hdr-trend"><div class="hdr-trend-row"><span class="hdr-trend-label">지난 주 대비</span><span class="hdr-badge score-5">▼</span></div><div class="hdr-trend-row"><span class="hdr-trend-label">지난 달 대비</span><span class="hdr-badge score-5">▼</span></div></div>
+      </div>
+      
+      
+      
+      <div class="value">99.07</div>
+      <div class="asof">기준일 2026-09-11</div>
+      
+      <div class="compare-row"><span>지난 주 대비</span><span>▼ -0.04</span></div><div class="compare-row"><span>지난 달 대비</span><span>▼ -0.76</span></div>
+      <ul class="note-list"><li>달러↑ ≈ S&amp;P500↓ 경향 (항상은 아님)</li><li>100 기준 — 이상 강세 / 미만 약세</li></ul><div class="extra-line">기준선(100) 대비: 약세 구간</div>
+    
+    </div>
+    
+      </div>
+    </section>
+    
+  
+    <section id="sec-trend">
+      <h2>시장 추세</h2>
+      <div class="section-desc">신용 여건이 얼마나 완화적/긴축적인지를 종합한 지수입니다(낮을수록 완화적).</div>
+      <div class="cards">
+        
+    <div class="card">
+      <div class="card-header">
+        <h3>Chicago Fed NFCI</h3>
+        <div class="hdr-trend"><div class="hdr-trend-row"><span class="hdr-trend-label">지난 주 대비</span><span class="hdr-badge score-5">▼</span></div><div class="hdr-trend-row"><span class="hdr-trend-label">지난 달 대비</span><span class="hdr-badge score-5">▼</span></div></div>
+      </div>
+      
+      
+      
+      <div class="value">-0.560</div>
+      <div class="asof">기준일 2026-09-11</div>
+      
+      <div class="compare-row"><span>지난 주 대비</span><span>▼ -0.002</span></div><div class="compare-row"><span>지난 달 대비</span><span>▼ -0.018</span></div>
+      <div class="extra-line">발표일: 2026-09-12</div><ul class="note-list"><li>0 이상 긴축적 / 0 미만 완화적</li><li>바닥 찍고 반등 시작 → 증시 저점 신호로 참고</li></ul><div class="extra-line">0 기준 대비: 완화적 구간</div>
+    
+    </div>
+    
+      </div>
+    </section>
+    
+  
+    <section id="sec-breadth">
+      <h2>시장 폭 (Breadth)</h2>
+      <div class="section-desc">S&amp;P500 종목 중 이동평균선을 상회하는 비율 + 지수 자체의 200주선 대비 위치 — 상승 참여도와 장기 저점 여부를 참고하는 영역입니다.</div>
+      
+      <div class="cards">
+    <div class="card" style="border-left-color:#60a5fa;">
+      <div class="card-header">
+        <h3>전체 시장 — 50DMA 상회 비율</h3>
+        <span class="band score-5">비관 구간</span>
+      </div>
+      
+      
+      
+      <div class="value">27.9%</div>
+      <div class="asof">기준일 2026-09-19</div>
+      <div class="gauge"><div class="gauge-track"><div style="flex:0 0 30.000%;background:#60a5fa;"></div><div style="flex:0 0 40.000%;background:#9ca3af;"></div><div style="flex:0 0 30.000%;background:#fb923c;"></div></div><div class="gauge-marker" style="left:27.94%;"></div></div>
+      <div class="compare-row"><span>지난 주 대비</span><span>→ N/A</span></div><div class="compare-row"><span>지난 달 대비</span><span>→ N/A</span></div>
+      <div class="extra-line">유효 종목 수: 501</div>
+      <ul class="note-list"><li>70%↑ = 과열 → 비중 축소·매도 준비</li><li>30%↓ = 비관 → 매수 준비 구간</li><li>70%↑에서 꺾이면 추격매수 금지, 30%↓ 뚫고 반등하면 저점 매수 신호</li></ul>
+    
+    </div>
+    
+    <div class="card" style="border-left-color:#9ca3af;">
+      <div class="card-header">
+        <h3>전체 시장 — 200DMA 상회 비율</h3>
+        <span class="band band-neutral">중립 구간</span>
+      </div>
+      
+      
+      
+      <div class="value">49.3%</div>
+      <div class="asof">기준일 2026-09-19</div>
+      <div class="gauge"><div class="gauge-track"><div style="flex:0 0 30.000%;background:#60a5fa;"></div><div style="flex:0 0 40.000%;background:#9ca3af;"></div><div style="flex:0 0 30.000%;background:#fb923c;"></div></div><div class="gauge-marker" style="left:49.30%;"></div></div>
+      <div class="compare-row"><span>지난 주 대비</span><span>→ N/A</span></div><div class="compare-row"><span>지난 달 대비</span><span>→ N/A</span></div>
+      <div class="extra-line">유효 종목 수: 501</div>
+      <ul class="note-list"><li>70%↑ = 과열 → 비중 축소·매도 준비</li><li>30%↓ = 비관 → 매수 준비 구간</li><li>70%↑에서 꺾이면 추격매수 금지, 30%↓ 뚫고 반등하면 저점 매수 신호</li></ul>
+    
+    </div>
+    
+    <div class="card" style="border-left-color:#9ca3af;">
+      <div class="card-header">
+        <h3>S&amp;P500 — 200주 이동평균 대비</h3>
+        <span class="band band-neutral">200주선 상회</span>
+      </div>
+      
+      
+      
+      <div class="value">7,638</div>
+      <div class="asof">기준일(주간) 2026-09-18</div>
+      <div class="extra-line">200주 이동평균: 5,630 (+35.7%)</div>
+      <div class="compare-row"><span>지난 주 대비</span><span>▼ -19</span></div><div class="compare-row"><span>지난 달 대비</span><span>▼ -148</span></div>
+      <ul class="note-list"><li>월가에서 부르는 침체 최후 방어선</li><li>터치/하회 시 웬만하면 저점 매수 타이밍으로 참고</li></ul>
+    
+    </div>
+    </div>
+    </section>
+    
+  
+    <section id="sec-sentiment">
+      <h2>투자심리</h2>
+      <div class="section-desc">시장 참여자 심리가 극단(광기/공포)에 가까운지 참고하는 영역입니다.</div>
+      <div class="cards">
+        
+    <div class="card" style="border-left-color:#4ade80;">
+      <div class="card-header">
+        <h3>CNN Fear &amp; Greed Index</h3>
+        <span class="band score-4">4 · 불안</span>
+      </div>
+      
+      
+      
+      <div class="value">29 <span class="value-suffix">· Fear</span></div>
+      <div class="asof">기준일 2026-09-18</div>
+      <div class="gauge"><div class="gauge-track"><div style="flex:0 0 25.000%;background:#60a5fa;"></div><div style="flex:0 0 20.000%;background:#4ade80;"></div><div style="flex:0 0 11.000%;background:#facc15;"></div><div style="flex:0 0 20.000%;background:#fb923c;"></div><div style="flex:0 0 24.000%;background:#f87171;"></div></div><div class="gauge-marker" style="left:29.11%;"></div></div>
+      <div class="compare-row"><span>전일 대비</span><span>▲ +0</span></div><div class="compare-row"><span>지난 주 대비</span><span>▼ -4</span></div><div class="compare-row"><span>지난 달 대비</span><span>▼ -26</span></div>
+    
+    </div>
+    
+        
+    <div class="card" style="border-left-color:#fb923c;">
+      <div class="card-header">
+        <h3>CBOE Volatility Index (VIX)</h3>
+        <span class="band score-2">2 · 과열</span>
+      </div>
+      
+      
+      
+      <div class="value">15.44</div>
+      <div class="asof">기준일 2026-09-17</div>
+      <div class="gauge"><div class="gauge-track"><div style="flex:0 0 22.222%;background:#f87171;"></div><div style="flex:0 0 11.111%;background:#fb923c;"></div><div style="flex:0 0 22.222%;background:#facc15;"></div><div style="flex:0 0 22.222%;background:#4ade80;"></div><div style="flex:0 0 22.222%;background:#60a5fa;"></div></div><div class="gauge-marker" style="left:23.20%;"></div></div>
+      <div class="compare-row"><span>지난 주 대비</span><span>▼ -2.40</span></div><div class="compare-row"><span>지난 달 대비</span><span>▼ -0.40</span></div>
+      
+    
+    </div>
+    
+        
+    <div class="card" style="border-left-color:#4ade80;">
+      <div class="card-header">
+        <h3>AAII Investor Sentiment (Bull-Bear Spread)</h3>
+        <span class="band score-4">4 · 불안</span>
+      </div>
+      
+      
+      
+      <div class="value">-24.5%p</div>
+      <div class="asof">기준일 2026-09-17</div>
+      <div class="gauge"><div class="gauge-track"><div style="flex:0 0 20.000%;background:#60a5fa;"></div><div style="flex:0 0 10.000%;background:#4ade80;"></div><div style="flex:0 0 40.000%;background:#facc15;"></div><div style="flex:0 0 10.000%;background:#fb923c;"></div><div style="flex:0 0 20.000%;background:#f87171;"></div></div><div class="gauge-marker" style="left:25.47%;"></div></div>
+      <div class="compare-row"><span>지난 주 대비</span><span>▼ -23.1%p</span></div><div class="compare-row"><span>지난 달 대비</span><span>▼ -21.3%p</span></div>
+      <div class="extra-line">Bullish 28.8% · Bearish 53.3%</div>
+    
+    </div>
+    
+      </div>
+    </section>
+    
+  
+    <section id="sec-contrarian">
+      <h2>역발상 지표</h2>
+      <div class="section-desc">옵션시장의 방어적 포지셔닝 정도를 참고하는 영역입니다.</div>
+      <div class="cards">
+        
+    <div class="card" style="border-left-color:#facc15;">
+      <div class="card-header">
+        <h3>CBOE Total Put/Call Ratio</h3>
+        <span class="band score-3">3 · 중립</span>
+      </div>
+      
+      
+      
+      <div class="value">0.81</div>
+      <div class="asof">기준일 2026-09-19</div>
+      <div class="gauge"><div class="gauge-track"><div style="flex:0 0 7.692%;background:#f87171;"></div><div style="flex:0 0 7.692%;background:#fb923c;"></div><div style="flex:0 0 38.462%;background:#facc15;"></div><div style="flex:0 0 15.385%;background:#4ade80;"></div><div style="flex:0 0 30.769%;background:#60a5fa;"></div></div><div class="gauge-marker" style="left:39.23%;"></div></div>
+      <div class="compare-row"><span>지난 주 대비</span><span>→ N/A</span></div><div class="compare-row"><span>지난 달 대비</span><span>→ N/A</span></div>
+      
+    
+    </div>
+    
+      </div>
+    </section>
+    
+  
+    <section id="sec-credit">
+      <h2>신용시장 위험</h2>
+      <div class="section-desc">신용시장의 레버리지·스트레스 신호를 참고하는 영역입니다.</div>
+      <div class="cards">
+        
+    <div class="card" style="border-left-color:#fb923c;">
+      <div class="card-header">
+        <h3>Margin Debt</h3>
+        <span class="band score-2">2 · 과열</span>
+      </div>
+      <div class="tags"><span class="tag tag-manual">월 1회 수동 갱신 필요 — FINRA 자동 차단</span></div>
+      
+      
+      <div class="value">+37.2%</div>
+      <div class="asof">전년 동월 대비(YoY) · 기준일 2026-08-31</div>
+      <div class="gauge"><div class="gauge-track"><div style="flex:0 0 18.182%;background:#60a5fa;"></div><div style="flex:0 0 9.091%;background:#4ade80;"></div><div style="flex:0 0 36.364%;background:#facc15;"></div><div style="flex:0 0 18.182%;background:#fb923c;"></div><div style="flex:0 0 18.182%;background:#f87171;"></div></div><div class="gauge-marker" style="left:79.26%;"></div></div>
+      <div class="extra-line">잔액: 1,453,832 (FINRA 발표 원자료 단위, 통상 US$ 백만)</div>
+      <div class="compare-row"><span>지난 주 대비</span><span>▲ +36607</span></div><div class="compare-row"><span>지난 달 대비</span><span>▲ +36607</span></div>
+      <div class="extra-line">이번 갱신 경로: 수동 등록 파일(data/margin_statistics_manual.xlsx)</div>
+    
+    </div>
+    
+        
+    <div class="card" style="border-left-color:#f87171;">
+      <div class="card-header">
+        <h3>High Yield Spread</h3>
+        <span class="band score-1">1 · 광기</span>
+      </div>
+      
+      
+      
+      <div class="value">2.70%</div>
+      <div class="asof">기준일 2026-09-17</div>
+      <div class="gauge"><div class="gauge-track"><div style="flex:0 0 20.000%;background:#f87171;"></div><div style="flex:0 0 26.667%;background:#facc15;"></div><div style="flex:0 0 53.333%;background:#4ade80;"></div></div><div class="gauge-marker" style="left:16.00%;"></div></div>
+      <div class="compare-row"><span>지난 주 대비</span><span>→ 0.00%</span></div><div class="compare-row"><span>지난 달 대비</span><span>▼ -0.05%</span></div>
+      <div class="extra-line">최근 1년 구간 고점 3.46% / 저점 2.60%</div>
+    
+    </div>
+    
+      </div>
+    </section>
+    
+  
+    <section>
+      <h2>추이 차트</h2>
+      <div class="charts">
+        <div class="chart-box chart-box-wide"><h3>High Yield Spread 추이(최근 1년)</h3><canvas id="hyChart"></canvas></div>
+      </div>
+    </section>
+    
+</main>
+<footer>이 대시보드는 개인 참고·체크리스트 용도입니다. 최종 투자 판단과 책임은 본인에게 있습니다.</footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+      const hyData = {"labels": ["2025-09-22", "2025-09-23", "2025-09-24", "2025-09-25", "2025-09-26", "2025-09-29", "2025-09-30", "2025-10-01", "2025-10-02", "2025-10-03", "2025-10-06", "2025-10-07", "2025-10-08", "2025-10-09", "2025-10-10", "2025-10-13", "2025-10-14", "2025-10-15", "2025-10-16", "2025-10-17", "2025-10-20", "2025-10-21", "2025-10-22", "2025-10-23", "2025-10-24", "2025-10-27", "2025-10-28", "2025-10-29", "2025-10-30", "2025-10-31", "2025-11-03", "2025-11-04", "2025-11-05", "2025-11-06", "2025-11-07", "2025-11-10", "2025-11-11", "2025-11-12", "2025-11-13", "2025-11-14", "2025-11-17", "2025-11-18", "2025-11-19", "2025-11-20", "2025-11-21", "2025-11-24", "2025-11-25", "2025-11-26", "2025-11-27", "2025-11-28", "2025-11-30", "2025-12-01", "2025-12-02", "2025-12-03", "2025-12-04", "2025-12-05", "2025-12-08", "2025-12-09", "2025-12-10", "2025-12-11", "2025-12-12", "2025-12-15", "2025-12-16", "2025-12-17", "2025-12-18", "2025-12-19", "2025-12-22", "2025-12-23", "2025-12-24", "2025-12-26", "2025-12-29", "2025-12-30", "2025-12-31", "2026-01-02", "2026-01-05", "2026-01-06", "2026-01-07", "2026-01-08", "2026-01-09", "2026-01-12", "2026-01-13", "2026-01-14", "2026-01-15", "2026-01-16", "2026-01-19", "2026-01-20", "2026-01-21", "2026-01-22", "2026-01-23", "2026-01-26", "2026-01-27", "2026-01-28", "2026-01-29", "2026-01-30", "2026-01-31", "2026-02-02", "2026-02-03", "2026-02-04", "2026-02-05", "2026-02-06", "2026-02-09", "2026-02-10", "2026-02-11", "2026-02-12", "2026-02-13", "2026-02-16", "2026-02-17", "2026-02-18", "2026-02-19", "2026-02-20", "2026-02-23", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-02-28", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02", "2026-04-03", "2026-04-06", "2026-04-07", "2026-04-08", "2026-04-09", "2026-04-10", "2026-04-13", "2026-04-14", "2026-04-15", "2026-04-16", "2026-04-17", "2026-04-20", "2026-04-21", "2026-04-22", "2026-04-23", "2026-04-24", "2026-04-27", "2026-04-28", "2026-04-29", "2026-04-30", "2026-05-01", "2026-05-04", "2026-05-05", "2026-05-06", "2026-05-07", "2026-05-08", "2026-05-11", "2026-05-12", "2026-05-13", "2026-05-14", "2026-05-15", "2026-05-18", "2026-05-19", "2026-05-20", "2026-05-21", "2026-05-22", "2026-05-25", "2026-05-26", "2026-05-27", "2026-05-28", "2026-05-29", "2026-05-31", "2026-06-01", "2026-06-02", "2026-06-03", "2026-06-04", "2026-06-05", "2026-06-08", "2026-06-09", "2026-06-10", "2026-06-11", "2026-06-12", "2026-06-15", "2026-06-16", "2026-06-17", "2026-06-18", "2026-06-19", "2026-06-22", "2026-06-23", "2026-06-24", "2026-06-25", "2026-06-26", "2026-06-29", "2026-06-30", "2026-07-01", "2026-07-02", "2026-07-03", "2026-07-06", "2026-07-07", "2026-07-08", "2026-07-09", "2026-07-10", "2026-07-13", "2026-07-14", "2026-07-15", "2026-07-16", "2026-07-17", "2026-07-20", "2026-07-21", "2026-07-22", "2026-07-23", "2026-07-24", "2026-07-27", "2026-07-28", "2026-07-29", "2026-07-30", "2026-07-31", "2026-08-03", "2026-08-04", "2026-08-05", "2026-08-06", "2026-08-07", "2026-08-10", "2026-08-11", "2026-08-12", "2026-08-13", "2026-08-14", "2026-08-17", "2026-08-18", "2026-08-19", "2026-08-20", "2026-08-21", "2026-08-24", "2026-08-25", "2026-08-26", "2026-08-27", "2026-08-28", "2026-08-31", "2026-09-01", "2026-09-02", "2026-09-03", "2026-09-04", "2026-09-07", "2026-09-08", "2026-09-09", "2026-09-10", "2026-09-11", "2026-09-14", "2026-09-15", "2026-09-16", "2026-09-17"], "values": [2.69, 2.71, 2.7, 2.76, 2.75, 2.74, 2.8, 2.81, 2.81, 2.8, 2.76, 2.82, 2.84, 2.95, 3.18, 3.18, 3.11, 2.95, 3.04, 3.04, 2.99, 2.97, 3.01, 2.96, 2.88, 2.8, 2.82, 2.76, 2.85, 2.94, 3.04, 3.13, 3.05, 3.13, 3.15, 3.02, 3.02, 3.02, 3.09, 3.07, 3.13, 3.2, 3.17, 3.17, 3.19, 3.15, 3.1, 3.0, 3.0, 2.95, 2.92, 2.94, 2.92, 2.89, 2.88, 2.85, 2.89, 2.89, 2.91, 2.88, 2.91, 2.91, 2.98, 2.99, 2.95, 2.9, 2.88, 2.83, 2.84, 2.86, 2.87, 2.84, 2.81, 2.83, 2.81, 2.79, 2.79, 2.76, 2.74, 2.74, 2.75, 2.76, 2.71, 2.65, 2.65, 2.73, 2.69, 2.64, 2.68, 2.69, 2.71, 2.72, 2.77, 2.8, 2.88, 2.81, 2.85, 2.86, 2.97, 2.87, 2.84, 2.86, 2.84, 2.92, 2.95, 2.94, 2.94, 2.86, 2.88, 2.86, 2.95, 2.97, 2.94, 2.98, 3.1, 3.12, 3.03, 3.08, 2.97, 3.0, 3.13, 3.19, 3.06, 3.09, 3.17, 3.28, 3.27, 3.22, 3.2, 3.27, 3.24, 3.19, 3.19, 3.17, 3.21, 3.42, 3.46, 3.28, 3.16, 3.17, 3.13, 3.05, 3.12, 2.94, 2.9, 2.94, 2.95, 2.84, 2.85, 2.86, 2.83, 2.87, 2.85, 2.84, 2.86, 2.86, 2.84, 2.85, 2.82, 2.83, 2.77, 2.78, 2.77, 2.75, 2.79, 2.81, 2.79, 2.82, 2.82, 2.76, 2.8, 2.83, 2.86, 2.8, 2.78, 2.74, 2.74, 2.72, 2.71, 2.72, 2.72, 2.74, 2.72, 2.71, 2.75, 2.74, 2.76, 2.75, 2.78, 2.8, 2.78, 2.71, 2.66, 2.71, 2.63, 2.66, 2.66, 2.65, 2.71, 2.76, 2.78, 2.83, 2.8, 2.75, 2.74, 2.75, 2.74, 2.72, 2.67, 2.7, 2.7, 2.69, 2.69, 2.72, 2.71, 2.71, 2.73, 2.69, 2.69, 2.68, 2.77, 2.79, 2.81, 2.84, 2.87, 2.84, 2.85, 2.78, 2.73, 2.75, 2.71, 2.7, 2.7, 2.72, 2.71, 2.71, 2.67, 2.7, 2.75, 2.73, 2.75, 2.7, 2.69, 2.7, 2.67, 2.63, 2.6, 2.63, 2.65, 2.66, 2.65, 2.68, 2.68, 2.67, 2.71, 2.7, 2.65, 2.71, 2.76, 2.7, 2.7]};
+
+      function renderLineChart(canvasId, data, label, color) {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas || data.labels.length < 2) return;
+        new Chart(canvas, {
+          type: 'line',
+          data: {
+            labels: data.labels,
+            datasets: [{
+              label: label,
+              data: data.values,
+              borderColor: color,
+              backgroundColor: color,
+              tension: 0.15,
+              pointRadius: 0,
+              pointHoverRadius: 4,
+              borderWidth: 2,
+            }],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: { legend: { display: false } },
+            scales: { x: { ticks: { maxTicksLimit: 12, autoSkip: true } } },
+          },
+        });
+      }
+
+      renderLineChart('hyChart', hyData, 'High Yield Spread(%)', '#dc2626');
+    </script>
+    
+</body>
+</html>
