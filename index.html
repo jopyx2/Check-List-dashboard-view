@@ -4,6 +4,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>미국 주식 시장환경 대시보드</title>
+<!-- 스마트폰 홈 화면에 '앱처럼' 추가할 수 있도록 하는 PWA 메타데이터.
+     manifest.json/아이콘 파일은 게시용(public) 저장소 루트에 별도로 둔다
+     (이 HTML은 매일 새로 생성되지만 그 파일들은 정적이라 그대로 유지됨). -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#111827">
+<link rel="icon" href="favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="주식체크리스트">
 <style>
 :root {
   color-scheme: light;
@@ -229,7 +239,7 @@ footer { text-align: center; color: var(--muted); font-size: 12px; padding-botto
 <body>
 <header>
   <h1>미국 주식 시장환경 대시보드</h1>
-  <div class="updated">마지막 갱신 시각: 2026-09-20 03:02:54</div>
+  <div class="updated">마지막 갱신 시각: 2026-09-20 12:33:54</div>
   <div class="health ok">데이터 상태: 12/12개 지표 정상 수집</div>
 </header>
 <main>
