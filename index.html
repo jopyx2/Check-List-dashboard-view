@@ -144,7 +144,23 @@ section .section-desc {
 }
 .value { font-size: 28px; font-weight: 700; margin-bottom: 4px; font-variant-numeric: tabular-nums; }
 .value-suffix { font-size: inherit; font-weight: inherit; }
-.asof { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+.asof {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+.fresh { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; margin-left: auto; font-size: 11px; text-align: right; }
+.fresh-line { display: inline-flex; align-items: center; gap: 5px; }
+.fresh-chip { padding: 1px 7px; border-radius: 999px; font-weight: 600; white-space: nowrap; }
+.fresh-ok { background: #bbf7d0; color: #166534; }
+.fresh-wait { background: #fef3c7; color: #92400e; }
+.fresh-late { background: #fecaca; color: #b91c1c; }
+.fresh-next { color: var(--muted); }
 .compare-row {
   display: flex;
   justify-content: space-between;
@@ -290,7 +306,7 @@ footer { text-align: center; color: var(--muted); font-size: 12px; padding-botto
 <div id="page-top"></div>
 <header>
   <h1>미국주식 시장환경 Check</h1>
-  <div class="updated">마지막 갱신 시각: 2026-10-24 01:04:55</div>
+  <div class="updated">마지막 갱신 시각: 2026-10-24 14:26:19</div>
   <div class="health ok">데이터 상태: 12/12개 지표 정상 수집</div>
 </header>
 <main>
@@ -376,7 +392,7 @@ footer { text-align: center; color: var(--muted); font-size: 12px; padding-botto
         <span class="chip-label">Put/Call</span>
         <span class="chip-band score-3">3 · 중립</span>
       </div>
-      <span class="chip-value">0.94</span>
+      <span class="chip-value">0.93</span>
     </a>
     
     <a class="chip" href="#card-margin-debt">
@@ -412,7 +428,7 @@ footer { text-align: center; color: var(--muted); font-size: 12px; padding-botto
       
       
       <div class="value">4.96%</div>
-      <div class="asof">기준일 2026-10-22</div>
+      <div class="asof"><span class="asof-date">기준일 2026-10-22</span><span class="fresh"><span class="fresh-line"><span class="fresh-chip fresh-ok">최신</span>매 영업일</span><span class="fresh-next">다음 갱신 10/26(월)</span></span></div>
       
       <div class="compare-row"><span>지난 주 대비</span><span>▼ -0.14%</span></div><div class="compare-row"><span>지난 달 대비</span><span>→ 0.00%</span></div>
       <ul class="note-list"><li>금리↑ → 증시 부담 (다우·에너지·금융은 견조)</li><li>금리↓ → 증시 우호 (건설·리츠·나스닥·고성장주)</li><li>마디선(라운드 넘버) 돌파 시 단기 변동성 유의</li></ul>
@@ -429,7 +445,7 @@ footer { text-align: center; color: var(--muted); font-size: 12px; padding-botto
       
       
       <div class="value">101.84</div>
-      <div class="asof">기준일 2026-10-16</div>
+      <div class="asof"><span class="asof-date">기준일 2026-10-16</span><span class="fresh"><span class="fresh-line"><span class="fresh-chip fresh-ok">최신</span>주 1회(월)</span><span class="fresh-next">다음 갱신 10/26(월)</span></span></div>
       
       <div class="compare-row"><span>지난 주 대비</span><span>▼ -0.46</span></div><div class="compare-row"><span>지난 달 대비</span><span>▲ +2.16</span></div>
       <ul class="note-list"><li>달러↑ ≈ S&amp;P500↓ 경향 (항상은 아님)</li><li>100 기준 — 이상 강세 / 미만 약세</li></ul><div class="extra-line">기준선(100) 대비: 강세 구간</div>
@@ -454,10 +470,10 @@ footer { text-align: center; color: var(--muted); font-size: 12px; padding-botto
       
       
       <div class="value">-0.496</div>
-      <div class="asof">기준일 2026-10-16</div>
+      <div class="asof"><span class="asof-date">기준일 2026-10-16</span><span class="fresh"><span class="fresh-line"><span class="fresh-chip fresh-ok">최신</span>주 1회(수)</span><span class="fresh-next">다음 갱신 10/28(수)</span></span></div>
       
       <div class="compare-row"><span>지난 주 대비</span><span>▲ +0.006</span></div><div class="compare-row"><span>지난 달 대비</span><span>▲ +0.041</span></div>
-      <div class="extra-line">발표일: 2026-10-17</div><ul class="note-list"><li>0 이상 긴축적 / 0 미만 완화적</li><li>바닥 찍고 반등 시작 → 증시 저점 신호로 참고</li></ul><div class="extra-line">0 기준 대비: 완화적 구간</div>
+      <ul class="note-list"><li>0 이상 긴축적 / 0 미만 완화적</li><li>바닥 찍고 반등 시작 → 증시 저점 신호로 참고</li></ul><div class="extra-line">0 기준 대비: 완화적 구간</div>
     
     </div>
     
@@ -479,9 +495,9 @@ footer { text-align: center; color: var(--muted); font-size: 12px; padding-botto
       
       
       <div class="value">58.0%</div>
-      <div class="asof">기준일 2026-10-24</div>
+      <div class="asof"><span class="asof-date">기준일 2026-10-23</span><span class="fresh"><span class="fresh-line"><span class="fresh-chip fresh-ok">최신</span>매 거래일</span><span class="fresh-next">다음 갱신 10/26(월)</span></span></div>
       <div class="gauge"><div class="gauge-track"><div style="flex:0 0 30.000%;background:#60a5fa;"></div><div style="flex:0 0 40.000%;background:#9ca3af;"></div><div style="flex:0 0 30.000%;background:#fb923c;"></div></div><div class="gauge-marker" style="left:58.00%;"></div><div class="gauge-labels"><span>낮음</span><span>높음</span></div></div>
-      <div class="compare-row"><span>지난 주 대비</span><span>▲ +13.0%</span></div><div class="compare-row"><span>지난 달 대비</span><span>▲ +32.1%</span></div>
+      <div class="compare-row"><span>지난 주 대비</span><span>▲ +13.0%</span></div><div class="compare-row"><span>지난 달 대비</span><span>▲ +29.1%</span></div>
       <div class="extra-line">출처: barchart.com (S&amp;P 500 Index)</div>
       <ul class="note-list"><li>70%↑ = 과열 → 비중 축소·매도 준비</li><li>30%↓ = 비관 → 매수 준비 구간</li><li>70%↑에서 꺾이면 추격매수 금지, 30%↓ 뚫고 반등하면 저점 매수 신호</li></ul>
     
@@ -496,9 +512,9 @@ footer { text-align: center; color: var(--muted); font-size: 12px; padding-botto
       
       
       <div class="value">56.0%</div>
-      <div class="asof">기준일 2026-10-24</div>
+      <div class="asof"><span class="asof-date">기준일 2026-10-23</span><span class="fresh"><span class="fresh-line"><span class="fresh-chip fresh-ok">최신</span>매 거래일</span><span class="fresh-next">다음 갱신 10/26(월)</span></span></div>
       <div class="gauge"><div class="gauge-track"><div style="flex:0 0 30.000%;background:#60a5fa;"></div><div style="flex:0 0 40.000%;background:#9ca3af;"></div><div style="flex:0 0 30.000%;background:#fb923c;"></div></div><div class="gauge-marker" style="left:56.00%;"></div><div class="gauge-labels"><span>낮음</span><span>높음</span></div></div>
-      <div class="compare-row"><span>지난 주 대비</span><span>▲ +4.0%</span></div><div class="compare-row"><span>지난 달 대비</span><span>▲ +10.9%</span></div>
+      <div class="compare-row"><span>지난 주 대비</span><span>▲ +4.0%</span></div><div class="compare-row"><span>지난 달 대비</span><span>▲ +8.5%</span></div>
       <div class="extra-line">출처: barchart.com (S&amp;P 500 Index)</div>
       <ul class="note-list"><li>70%↑ = 과열 → 비중 축소·매도 준비</li><li>30%↓ = 비관 → 매수 준비 구간</li><li>70%↑에서 꺾이면 추격매수 금지, 30%↓ 뚫고 반등하면 저점 매수 신호</li></ul>
     
@@ -513,7 +529,7 @@ footer { text-align: center; color: var(--muted); font-size: 12px; padding-botto
       
       
       <div class="value">7,757</div>
-      <div class="asof">기준일(주간) 2026-10-23</div>
+      <div class="asof"><span class="asof-date">기준일(최근 종가) 2026-10-21</span><span class="fresh"><span class="fresh-line"><span class="fresh-chip fresh-ok">최신</span>매 영업일</span><span class="fresh-next">다음 갱신 10/26(월)</span></span></div>
       <div class="extra-line">200주 이동평균: 5,725 (+35.5%)</div>
       <div class="compare-row"><span>지난 주 대비</span><span>▲ +98</span></div><div class="compare-row"><span>지난 달 대비</span><span>▲ +107</span></div>
       <ul class="note-list"><li>월가에서 부르는 침체 최후 방어선</li><li>터치/하회 시 웬만하면 저점 매수 타이밍으로 참고</li></ul>
@@ -537,7 +553,7 @@ footer { text-align: center; color: var(--muted); font-size: 12px; padding-botto
       
       
       <div class="value">21 <span class="value-suffix">· Extreme Fear</span></div>
-      <div class="asof">기준일 2026-10-23</div>
+      <div class="asof"><span class="asof-date">기준일 2026-10-23</span><span class="fresh"><span class="fresh-line"><span class="fresh-chip fresh-ok">최신</span>매 거래일</span><span class="fresh-next">다음 갱신 10/26(월)</span></span></div>
       <div class="gauge"><div class="gauge-track"><div style="flex:0 0 25.000%;background:#60a5fa;"></div><div style="flex:0 0 20.000%;background:#4ade80;"></div><div style="flex:0 0 11.000%;background:#facc15;"></div><div style="flex:0 0 20.000%;background:#fb923c;"></div><div style="flex:0 0 24.000%;background:#f87171;"></div></div><div class="gauge-marker" style="left:20.98%;"></div><div class="gauge-labels"><span>낮음</span><span>높음</span></div></div>
       <div class="compare-row"><span>전일 대비</span><span>▲ +1</span></div><div class="compare-row"><span>지난 주 대비</span><span>▼ -1</span></div><div class="compare-row"><span>지난 달 대비</span><span>▼ -12</span></div>
       <ul class="note-list"><li>지수가 낮을수록 매수 기회, 높을수록 매도 고려</li></ul>
@@ -554,7 +570,7 @@ footer { text-align: center; color: var(--muted); font-size: 12px; padding-botto
       
       
       <div class="value">19.03</div>
-      <div class="asof">기준일 2026-10-22</div>
+      <div class="asof"><span class="asof-date">기준일 2026-10-22</span><span class="fresh"><span class="fresh-line"><span class="fresh-chip fresh-ok">최신</span>매 영업일</span><span class="fresh-next">다음 갱신 10/26(월)</span></span></div>
       <div class="gauge"><div class="gauge-track"><div style="flex:0 0 22.222%;background:#60a5fa;"></div><div style="flex:0 0 22.222%;background:#4ade80;"></div><div style="flex:0 0 22.222%;background:#facc15;"></div><div style="flex:0 0 11.111%;background:#fb923c;"></div><div style="flex:0 0 22.222%;background:#f87171;"></div></div><div class="gauge-marker" style="left:68.82%;"></div><div class="gauge-labels"><span>높음</span><span>낮음</span></div></div>
       <div class="compare-row"><span>지난 주 대비</span><span>▲ +2.57</span></div><div class="compare-row"><span>지난 달 대비</span><span>▲ +4.82</span></div>
       <ul class="note-list"><li>지수가 높을수록 매수 기회</li><li>급등(30↑)은 저점 확인에 유용, 낮다고 고점 신호는 아님</li></ul>
@@ -571,7 +587,7 @@ footer { text-align: center; color: var(--muted); font-size: 12px; padding-botto
       
       
       <div class="value">-8.9%p</div>
-      <div class="asof">기준일 2026-10-22</div>
+      <div class="asof"><span class="asof-date">기준일 2026-10-22</span><span class="fresh"><span class="fresh-line"><span class="fresh-chip fresh-ok">최신</span>주 1회(목)</span><span class="fresh-next">다음 갱신 10/29(목)</span></span></div>
       <div class="gauge"><div class="gauge-track"><div style="flex:0 0 20.000%;background:#60a5fa;"></div><div style="flex:0 0 10.000%;background:#4ade80;"></div><div style="flex:0 0 40.000%;background:#facc15;"></div><div style="flex:0 0 10.000%;background:#fb923c;"></div><div style="flex:0 0 20.000%;background:#f87171;"></div></div><div class="gauge-marker" style="left:41.06%;"></div><div class="gauge-labels"><span>낮음</span><span>높음</span></div></div>
       <div class="compare-row"><span>지난 주 대비</span><span>▼ -6.0%p</span></div><div class="compare-row"><span>지난 달 대비</span><span>▲ +15.6%p</span></div>
       <div class="extra-line">Bullish 36.9% · Bearish 45.8%</div><ul class="note-list"><li>증시 저점을 잘 맞히지만 고점을 잘 못 맞힘</li><li>-20% 이하로 내려가면 분할 매수 적극 검토</li></ul>
@@ -587,10 +603,10 @@ footer { text-align: center; color: var(--muted); font-size: 12px; padding-botto
       
       
       
-      <div class="value">0.94</div>
-      <div class="asof">기준일 2026-10-24</div>
-      <div class="gauge"><div class="gauge-track"><div style="flex:0 0 30.769%;background:#60a5fa;"></div><div style="flex:0 0 15.385%;background:#4ade80;"></div><div style="flex:0 0 38.462%;background:#facc15;"></div><div style="flex:0 0 7.692%;background:#fb923c;"></div><div style="flex:0 0 7.692%;background:#f87171;"></div></div><div class="gauge-marker" style="left:50.77%;"></div><div class="gauge-labels"><span>높음</span><span>낮음</span></div></div>
-      <div class="compare-row"><span>지난 주 대비</span><span>▲ +0.02</span></div><div class="compare-row"><span>지난 달 대비</span><span>▲ +0.08</span></div>
+      <div class="value">0.93</div>
+      <div class="asof"><span class="asof-date">기준일 2026-10-24</span><span class="fresh"><span class="fresh-line"><span class="fresh-chip fresh-ok">최신</span>매 거래일</span><span class="fresh-next">다음 갱신 10/26(월)</span></span></div>
+      <div class="gauge"><div class="gauge-track"><div style="flex:0 0 30.769%;background:#60a5fa;"></div><div style="flex:0 0 15.385%;background:#4ade80;"></div><div style="flex:0 0 38.462%;background:#facc15;"></div><div style="flex:0 0 7.692%;background:#fb923c;"></div><div style="flex:0 0 7.692%;background:#f87171;"></div></div><div class="gauge-marker" style="left:51.54%;"></div><div class="gauge-labels"><span>높음</span><span>낮음</span></div></div>
+      <div class="compare-row"><span>지난 주 대비</span><span>▲ +0.01</span></div><div class="compare-row"><span>지난 달 대비</span><span>▲ +0.07</span></div>
       <ul class="note-list"><li>높으면 하락 베팅, 낮으면 상승 베팅했다는 의미</li><li>Put/Call 비율의 고점은 증시 바닥과 일치</li><li>1 이상=1차 매수, 1.5 이상=2차 매수, 2 이상=3차 매수</li></ul>
     
     </div>
@@ -613,7 +629,7 @@ footer { text-align: center; color: var(--muted); font-size: 12px; padding-botto
       
       
       <div class="value">+31.4%</div>
-      <div class="asof">전년 동월 대비(YoY) · 기준일 2026-09-30</div>
+      <div class="asof"><span class="asof-date">전년 동월 대비(YoY) · 기준일 2026-09-30</span><span class="fresh"><span class="fresh-line"><span class="fresh-chip fresh-ok">최신</span>월 1회(3주차)</span><span class="fresh-next">다음 갱신 11월 3주차(11/15~21)</span></span></div>
       <div class="gauge"><div class="gauge-track"><div style="flex:0 0 18.182%;background:#60a5fa;"></div><div style="flex:0 0 9.091%;background:#4ade80;"></div><div style="flex:0 0 36.364%;background:#facc15;"></div><div style="flex:0 0 18.182%;background:#fb923c;"></div><div style="flex:0 0 18.182%;background:#f87171;"></div></div><div class="gauge-marker" style="left:73.99%;"></div><div class="gauge-labels"><span>낮음</span><span>높음</span></div></div>
       <div class="extra-line">잔액: 1,480,054 (FINRA 발표 원자료 단위, 통상 US$ 백만)</div>
       <div class="compare-row"><span>지난 주 대비</span><span>▲ +26222</span></div><div class="compare-row"><span>지난 달 대비</span><span>▲ +26222</span></div>
@@ -632,7 +648,7 @@ footer { text-align: center; color: var(--muted); font-size: 12px; padding-botto
       
       
       <div class="value">3.40%</div>
-      <div class="asof">기준일 2026-10-22</div>
+      <div class="asof"><span class="asof-date">기준일 2026-10-22</span><span class="fresh"><span class="fresh-line"><span class="fresh-chip fresh-ok">최신</span>매 영업일</span><span class="fresh-next">다음 갱신 10/26(월)</span></span></div>
       <div class="gauge"><div class="gauge-track"><div style="flex:0 0 53.333%;background:#4ade80;"></div><div style="flex:0 0 26.667%;background:#facc15;"></div><div style="flex:0 0 20.000%;background:#f87171;"></div></div><div class="gauge-marker" style="left:74.67%;"></div><div class="gauge-labels"><span>높음</span><span>낮음</span></div></div>
       <div class="compare-row"><span>지난 주 대비</span><span>▲ +0.17%</span></div><div class="compare-row"><span>지난 달 대비</span><span>▲ +0.72%</span></div>
       <div class="extra-line">최근 1년 구간 고점 3.46% / 저점 2.60%</div>
